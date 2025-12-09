@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { verifyPassword, createSession } from "@/lib/auth"
 
 export async function POST(request: Request) {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Username and password are required" }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const supabase = createAdminClient()
 
     // Find user by username
     const { data: user, error } = await supabase
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    console.error("Login error:", error)
+    console.error("[v0] Login error:", error)
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }

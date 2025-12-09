@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { hashPassword, createSession } from "@/lib/auth"
 
 export async function POST(request: Request) {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const supabase = createAdminClient()
 
     // Check if username already exists
     const { data: existingUser } = await supabase
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
-      console.error("Error creating user:", error)
+      console.error("[v0] Error creating user:", error)
       return NextResponse.json({ error: "Failed to create account" }, { status: 500 })
     }
 
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    console.error("Signup error:", error)
+    console.error("[v0] Signup error:", error)
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }

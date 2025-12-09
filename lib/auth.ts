@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 // Simple hash function for passwords (using Web Crypto API)
 export async function hashPassword(password: string): Promise<string> {
@@ -33,7 +33,7 @@ export async function getCurrentUser() {
     return null
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   // Get session and user
   const { data: session, error } = await supabase
@@ -52,7 +52,7 @@ export async function getCurrentUser() {
 
 // Create a session for user
 export async function createSession(userId: string) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const token = generateSessionToken()
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7) // 7 days expiry
@@ -64,6 +64,7 @@ export async function createSession(userId: string) {
   })
 
   if (error) {
+    console.error("[v0] Failed to create session:", error)
     throw new Error("Failed to create session")
   }
 
@@ -72,6 +73,6 @@ export async function createSession(userId: string) {
 
 // Delete session (logout)
 export async function deleteSession(token: string) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   await supabase.from("sessions").delete().eq("token", token)
 }
