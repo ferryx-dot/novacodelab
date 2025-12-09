@@ -4,7 +4,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,21 +18,22 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        router.push("/dashboard")
-      } else {
+      try {
+        const response = await fetch("/api/auth/me")
+        if (response.ok) {
+          router.push("/dashboard")
+        } else {
+          setIsCheckingAuth(false)
+        }
+      } catch {
         setIsCheckingAuth(false)
       }
     }
     checkUser()
-  }, [router, supabase.auth])
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,15 +41,18 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      // Use username as email for login (username@novacode.local)
-      const email = `${username.toLowerCase()}@novacode.local`
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       })
 
-      if (error) throw error
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Invalid credentials")
+      }
+
       router.push("/dashboard")
       router.refresh()
     } catch (err) {

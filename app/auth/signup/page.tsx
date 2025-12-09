@@ -1,11 +1,9 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -56,40 +54,23 @@ export default function SignUpPage() {
       return
     }
 
-    const supabase = createClient()
-
     try {
-      // Use username as email (username@novacode.local)
-      const email = `${username.toLowerCase()}@novacode.local`
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
-          data: {
-            username: username.toLowerCase(),
-          },
-        },
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       })
 
-      if (error) throw error
+      const data = await response.json()
 
-      // Auto-login after signup for simple auth without email verification
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (signInError) throw signInError
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create account")
+      }
 
       router.push("/dashboard")
+      router.refresh()
     } catch (err) {
-      if (err instanceof Error && err.message.includes("already registered")) {
-        setError("Username already taken")
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to create account")
-      }
+      setError(err instanceof Error ? err.message : "Failed to create account")
     } finally {
       setIsLoading(false)
     }
