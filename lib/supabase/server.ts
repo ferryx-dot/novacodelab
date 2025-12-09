@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { createServerClient } from "@supabase/ssr"
 
 // Server-side Supabase client for Next.js
 
@@ -43,65 +44,22 @@ type SupabaseFilterBuilder = {
   then: (resolve: (result: { data: unknown[]; error: Error | null }) => void) => Promise<void>
 }
 
-function createMockClient(): SupabaseClient {
-  const createFilterBuilder = (): SupabaseFilterBuilder => {
-    const builder: SupabaseFilterBuilder = {
-      eq: () => builder,
-      neq: () => builder,
-      gt: () => builder,
-      gte: () => builder,
-      lt: () => builder,
-      lte: () => builder,
-      like: () => builder,
-      ilike: () => builder,
-      is: () => builder,
-      in: () => builder,
-      contains: () => builder,
-      order: () => builder,
-      limit: () => builder,
-      range: () => builder,
-      single: async () => ({ data: null, error: null }),
-      maybeSingle: async () => ({ data: null, error: null }),
-      then: async (resolve) => resolve({ data: [], error: null }),
-    }
-    return builder
-  }
+export async function createClient() {
+  const cookieStore = await cookies()
 
-  return {
-    auth: {
-      getUser: async () => ({ data: { user: null }, error: null }),
-    },
-    from: () => ({
-      select: () => createFilterBuilder(),
-      insert: () => createFilterBuilder(),
-      update: () => createFilterBuilder(),
-      delete: () => createFilterBuilder(),
-      upsert: () => createFilterBuilder(),
-    }),
-  }
-}
-
-export async function createClient(): Promise<SupabaseClient> {
-  try {
-    const { createServerClient } = await import("@supabase/ssr")
-    const cookieStore = await cookies()
-
-    return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-          } catch {
-            // Server Component - ignore
-          }
-        },
+  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
       },
-    }) as unknown as SupabaseClient
-  } catch {
-    // Fallback to mock client in preview
-    return createMockClient()
-  }
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+        } catch {
+          // The "setAll" method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing user sessions.
+        }
+      },
+    },
+  })
 }
