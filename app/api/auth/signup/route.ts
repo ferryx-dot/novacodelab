@@ -48,6 +48,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to create account" }, { status: 500 })
     }
 
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: newUser.id,
+      username: newUser.username,
+      balance: newUser.balance,
+      is_admin: newUser.is_admin,
+      avatar_url: null,
+      bio: null,
+      is_verified: false,
+      reputation_score: 0,
+      total_sales: 0,
+      total_purchases: 0,
+      files_uploaded: 0,
+      messages_sent: 0,
+      storage_used: 0,
+    })
+
+    if (profileError) {
+      console.error("[v0] Error creating profile:", profileError)
+      // Don't fail signup if profile creation fails - it will be created on first dashboard load
+    }
+
     // Create session
     const sessionToken = await createSession(newUser.id)
 

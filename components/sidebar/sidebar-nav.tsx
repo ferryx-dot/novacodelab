@@ -1,0 +1,31 @@
+import {
+  LayoutDashboard,
+  Code2,
+  Store,
+  Users,
+  Terminal,
+  Settings,
+  FileCode,
+  Play,
+  BookOpen,
+  Briefcase,
+  Package,
+  Hash,
+  Trophy,
+} from "lucide-react"
+
+const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/ai-studio", label: "AI Code Studio", icon: Code2 },
+  { href: "/marketplace", label: "Marketplace", icon: Store },
+  { href: "/marketplace/bundles", label: "File Bundles", icon: Package },
+  { href: "/snippets", label: "Code Snippets", icon: FileCode },
+  { href: "/playground", label: "Playground", icon: Play },
+  { href: "/courses", label: "Courses", icon: BookOpen },
+  { href: "/jobs", label: "Job Board", icon: Briefcase },
+  { href: "/community", label: "Community Chat", icon: Users },
+  { href: "/community/channels", label: "Channels", icon: Hash },
+  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { href: "/terminal", label: "Terminal", icon: Terminal },
+  { href: "/settings", label: "Settings", icon: Settings },
+]

@@ -24,6 +24,10 @@ import {
   ChevronLeft,
   Crown,
   BadgeCheck,
+  FileCode,
+  Briefcase,
+  PlayCircle,
+  BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -34,12 +38,16 @@ const navItems = [
   { href: "/ai-studio", label: "AI Code Studio", icon: Code2 },
   { href: "/bot-arsenal", label: "Bot Arsenal", icon: Bot },
   { href: "/coding-hub", label: "Coding Hub", icon: FolderCode },
+  { href: "/snippets", label: "Code Snippets", icon: FileCode },
+  { href: "/playground", label: "Playground", icon: PlayCircle },
   { href: "/academy", label: "Academy", icon: GraduationCap },
+  { href: "/courses", label: "Courses", icon: BookOpen },
   { href: "/design-studio", label: "Design Studio", icon: Palette },
   { href: "/toolbox", label: "Toolbox", icon: Wrench },
   { href: "/ai-chat", label: "AI Chat", icon: MessageSquare },
   { href: "/advanced-lab", label: "Advanced Lab", icon: FlaskConical },
   { href: "/marketplace", label: "Marketplace", icon: Store },
+  { href: "/jobs", label: "Job Board", icon: Briefcase },
   { href: "/profile", label: "Profile", icon: User },
   { href: "/community", label: "Community", icon: Users },
   { href: "/terminal", label: "Terminal", icon: Terminal },

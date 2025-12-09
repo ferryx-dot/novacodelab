@@ -1,6 +1,7 @@
 import type React from "react"
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getOrCreateProfile } from "@/lib/auth"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { AppLayout } from "@/components/layout/app-layout"
 import type { Profile, Notification } from "@/lib/types"
 
@@ -9,25 +10,21 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
+  const user = await getCurrentUser()
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError || !user) {
+  if (!user) {
     redirect("/auth/login")
   }
 
-  // Fetch user profile
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+  // Get or create profile for user
+  const profile = await getOrCreateProfile(user)
 
   if (!profile) {
     redirect("/auth/login")
   }
 
-  // Fetch notifications
+  // Fetch notifications using admin client
+  const supabase = createAdminClient()
   const { data: notifications } = await supabase
     .from("notifications")
     .select("*")

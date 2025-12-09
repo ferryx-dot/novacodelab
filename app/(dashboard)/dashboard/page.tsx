@@ -1,21 +1,23 @@
-import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
+import { getCurrentUser, getOrCreateProfile } from "@/lib/auth"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { DashboardContent } from "@/components/dashboard/dashboard-content"
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const user = await getCurrentUser()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect("/auth/login")
+  }
 
-  // Fetch profile
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user!.id).single()
+  const supabase = createAdminClient()
+  const profile = await getOrCreateProfile(user)
 
   // Fetch recent transactions
   const { data: transactions } = await supabase
     .from("transactions")
     .select("*, other_party:profiles!transactions_other_party_id_fkey(username, avatar_url)")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(5)
 
@@ -28,7 +30,7 @@ export default async function DashboardPage() {
     .limit(5)
 
   // Fetch user's achievements
-  const { data: achievements } = await supabase.from("achievements").select("*").eq("user_id", user!.id)
+  const { data: achievements } = await supabase.from("achievements").select("*").eq("user_id", user.id)
 
   return (
     <DashboardContent

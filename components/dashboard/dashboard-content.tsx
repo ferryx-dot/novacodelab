@@ -22,7 +22,10 @@ import {
   BadgeCheck,
   ArrowRight,
   Flame,
+  FileCode,
+  Briefcase,
 } from "lucide-react"
+import { LeaderboardSection } from "@/components/leaderboard/leaderboard-section"
 
 interface DashboardContentProps {
   profile: Profile
@@ -45,6 +48,8 @@ export function DashboardContent({ profile, transactions, trendingFiles, achieve
     { href: "/ai-studio", label: "AI Code Studio", icon: Code2, color: "bg-blue-500/10 text-blue-500" },
     { href: "/marketplace", label: "Marketplace", icon: Store, color: "bg-green-500/10 text-green-500" },
     { href: "/community", label: "Community Chat", icon: Users, color: "bg-purple-500/10 text-purple-500" },
+    { href: "/snippets", label: "Code Snippets", icon: FileCode, color: "bg-cyan-500/10 text-cyan-500" },
+    { href: "/jobs", label: "Job Board", icon: Briefcase, color: "bg-amber-500/10 text-amber-500" },
     { href: "/marketplace/upload", label: "Upload File", icon: Upload, color: "bg-orange-500/10 text-orange-500" },
   ]
 
@@ -112,21 +117,23 @@ export function DashboardContent({ profile, transactions, trendingFiles, achieve
       {/* Quick Actions */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {quickActions.map((action, index) => (
             <Link key={index} href={action.href}>
               <Card className="bg-card/50 border-border/50 hover:bg-accent/50 hover:border-primary/50 transition-all duration-200 cursor-pointer group h-full">
-                <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                  <div className={`p-4 rounded-xl ${action.color} group-hover:scale-110 transition-transform`}>
-                    <action.icon className="w-6 h-6" />
+                <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                  <div className={`p-3 rounded-xl ${action.color} group-hover:scale-110 transition-transform`}>
+                    <action.icon className="w-5 h-5" />
                   </div>
-                  <span className="font-medium text-foreground">{action.label}</span>
+                  <span className="font-medium text-sm text-foreground">{action.label}</span>
                 </CardContent>
               </Card>
             </Link>
           ))}
         </div>
       </div>
+
+      <LeaderboardSection />
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Recent Activity */}
